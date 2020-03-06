@@ -1,0 +1,8 @@
+# root files
+node_modules
+
+# app files
+app/dist
+app/coverage
+
+# server files
