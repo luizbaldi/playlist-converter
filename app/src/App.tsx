@@ -1,15 +1,47 @@
 import React from 'react';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { reset, themes } from 'react95';
+import { createGlobalStyle, ThemeProvider } from 'styled-components';
 
-const baseUrl = 'http://localhost:4000';
+import { AuthRedirect, Home } from './screens';
+import { AuthProvider } from './contexts';
 
-function App() {
+const ResetStyles = createGlobalStyle`
+  ${reset};
+
+  body {
+    background-color: teal;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+`;
+
+const App = () => {
   return (
-    <div>
-      <a href={`${baseUrl}/spotify-login`}>Log in with Spotify</a>
-      <hr />
-      <a href={`${baseUrl}/youtube-login`}>Log in with Youtube</a>
-    </div>
+    <>
+      <ResetStyles />
+      <Router>
+        <Switch>
+          <ThemeProvider theme={themes.default}>
+            <AuthProvider>
+              <Route path='/spotify-auth'>
+                <AuthRedirect auth='spotify' />
+              </Route>
+              <Route path='/yt-auth'>
+                <AuthRedirect auth='youtube' />
+              </Route>
+              <Route path='/'>
+                <Home />
+              </Route>
+            </AuthProvider>
+          </ThemeProvider>
+        </Switch>
+      </Router>
+    </>
   );
-}
+};
 
 export default App;
