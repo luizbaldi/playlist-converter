@@ -1,5 +1,5 @@
 declare module 'react95' {
-  import { ReactNode } from 'react';
+  import { ReactNode, FunctionComponent } from 'react';
 
   interface Theme {
     hatchedBackground: string;
@@ -44,9 +44,43 @@ declare module 'react95' {
   export const themes: Themes;
 
   /* components */
-  export const Window: {
-    shadow: string;
-    className: string;
+  export const Window: FunctionComponent<{
+    style?: object;
+    shadow?: boolean;
+    className?: string;
+    children?: ReactNode;
+  }>;
+
+  export const WindowHeader: FunctionComponent<{
+    className?: string;
+    style?: object;
+    children?: ReactNode;
+  }>;
+
+  export const WindowContent: FunctionComponent<{
+    className?: string;
+    style?: object;
+    children?: ReactNode;
+  }>;
+
+  export const Cutout: FunctionComponent<{
+    style?: object;
+    shadow?: boolean;
+    className?: string;
+    children?: ReactNode;
+  }>;
+
+  export const Button: FunctionComponent<{
     children: ReactNode;
-  };
+    type?: string;
+    onClick?: () => void;
+    style?: object;
+    disabled?: boolean;
+    fullWidth?: boolean;
+    size?: 'sm' | 'md' | 'lg';
+    square?: boolean;
+    active?: boolean;
+    variant?: 'default' | 'menu' | 'flat';
+    className?: string;
+  }>;
 }
