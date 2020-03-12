@@ -5,16 +5,11 @@ import { Cutout, Button } from 'react95';
 type Props = {
   platform: string;
   label: string;
-  connectionHref: string;
   icon?: string | null;
+  children: React.ReactNode;
 };
 
-const PlatformBox = ({
-  platform,
-  label,
-  connectionHref,
-  icon = null
-}: Props) => {
+const PlatformBox = ({ platform, label, icon = null, children }: Props) => {
   return (
     <div>
       <StyledLabel>{label}</StyledLabel>
@@ -23,9 +18,7 @@ const PlatformBox = ({
           {icon && <StyledIcon src={icon} alt={`${platform} icon`} />}
           <span>{platform}</span>
         </StyledLabelRow>
-        <StyledConnectButton size='sm'>
-          <StyledConnectLink href={connectionHref}>Connect</StyledConnectLink>
-        </StyledConnectButton>
+        {children}
       </StyledCutout>
     </div>
   );
@@ -41,10 +34,6 @@ const StyledCutout = styled(Cutout)`
   margin-top: 2px;
 `;
 
-const StyledConnectButton = styled(Button)`
-  margin-top: 12px;
-`;
-
 const StyledIcon = styled.img`
   height: 24px;
   width: 24px;
@@ -55,10 +44,6 @@ const StyledIcon = styled.img`
 const StyledLabelRow = styled.div`
   display: flex;
   align-items: center;
-`;
-
-const StyledConnectLink = styled.a`
-  font-size: 0.8em;
 `;
 
 const StyledLabel = styled.span`

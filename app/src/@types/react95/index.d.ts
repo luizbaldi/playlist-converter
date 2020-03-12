@@ -83,4 +83,26 @@ declare module 'react95' {
     variant?: 'default' | 'menu' | 'flat';
     className?: string;
   }>;
+
+  export const List: FunctionComponent<{
+    className?: string;
+    style?: object;
+    fullWidth?: boolean;
+    inline?: boolean;
+    shadow?: boolean;
+    children?: ReactNode;
+    verticalAlign?: 'top' | 'bottom';
+    horizontalAlign?: 'left' | 'right';
+    onClick?: () => void;
+  }>;
+
+  export const ListItem: FunctionComponent<{
+    className?: string;
+    style?: object;
+    size?: 'sm' | 'md' | 'lg';
+    disabled?: boolean;
+    square?: boolean;
+    children?: ReactNode;
+    onClick?: () => void;
+  }>;
 }

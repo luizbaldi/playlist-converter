@@ -15,10 +15,10 @@ const AuthRedirect = ({ auth }: Props) => {
   useEffect(() => {
     switch (auth) {
       case 'spotify':
-        setSpotifyToken(code);
+        setSpotifyToken(code || '');
         break;
       case 'youtube':
-        setYoutubeToken(code);
+        setYoutubeToken(code || '');
         break;
     }
   }, [auth, code, setSpotifyToken, setYoutubeToken]);

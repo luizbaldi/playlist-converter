@@ -3,16 +3,16 @@ import React, { createContext, useState } from 'react';
 import storage from '../utils/storage';
 
 type AuthContext = {
-  spotifyToken: string | null;
-  setSpotifyToken(token: string | null): void;
-  youtubeToken: string | null;
-  setYoutubeToken(token: string | null): void;
+  spotifyToken: string;
+  setSpotifyToken(token: string): void;
+  youtubeToken: string;
+  setYoutubeToken(token: string): void;
 };
 
 const AuthContext = createContext<AuthContext>({
-  spotifyToken: null,
+  spotifyToken: '',
   setSpotifyToken: () => {},
-  youtubeToken: null,
+  youtubeToken: '',
   setYoutubeToken: () => {}
 });
 
@@ -24,8 +24,22 @@ const storageSpotifyToken = storage.get('spotifyToken');
 const storageYoutubeToken = storage.get('youtubeToken');
 
 const AuthProvider = ({ children }: Props) => {
-  const [spotifyToken, setSpotifyToken] = useState(storageSpotifyToken);
-  const [youtubeToken, setYoutubeToken] = useState(storageYoutubeToken);
+  const [spotifyToken, setSpotifyTokenState] = useState(
+    storageSpotifyToken || ''
+  );
+  const [youtubeToken, setYoutubeTokenState] = useState(
+    storageYoutubeToken || ''
+  );
+
+  const setSpotifyToken = (token: string) => {
+    setSpotifyTokenState(token);
+    storage.set('spotifyToken', token);
+  };
+
+  const setYoutubeToken = (token: string) => {
+    setYoutubeTokenState(token);
+    storage.set('youtubeToken', token);
+  };
 
   return (
     <AuthContext.Provider

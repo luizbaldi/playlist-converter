@@ -6,13 +6,19 @@ import { refreshIcon } from '../../icons';
 import { capitalizeFirst } from '../../utils/string';
 
 import usePlatform from './usePlatform';
-
 import PlatformBox from './components/PlatformBox';
+import SelectDropdown from './components/SelectDropdown';
 
 const Home = () => {
   const { youtubeToken, spotifyToken, from, to, onTogglePress } = usePlatform();
 
-  console.log({ spotifyToken, youtubeToken });
+  const getToken = (type: string) => {
+    if (type === 'spotify') {
+      return spotifyToken;
+    }
+
+    return youtubeToken;
+  };
 
   return (
     <Window>
@@ -24,9 +30,26 @@ const Home = () => {
           <PlatformBox
             label='From:'
             platform={capitalizeFirst(from.type)}
-            connectionHref={from.href}
             icon={from.icon}
-          />
+          >
+            {!getToken(from.type) && (
+              <StyledConnectButton size='sm'>
+                <StyledConnectLink href={from.href}>Connect</StyledConnectLink>
+              </StyledConnectButton>
+            )}
+            <SelectDropdown
+              items={[
+                {
+                  label: 'Potatoe',
+                  onClick: () => {}
+                },
+                {
+                  label: 'More Potatoe',
+                  onClick: () => {}
+                }
+              ]}
+            />
+          </PlatformBox>
           <StyledChangeOrderContainer>
             <Button onClick={onTogglePress}>
               <StyledRotateIcon src={refreshIcon} alt='Refresh icon' />
@@ -35,9 +58,14 @@ const Home = () => {
           <PlatformBox
             label='To:'
             platform={capitalizeFirst(to.type)}
-            connectionHref={to.href}
             icon={to.icon}
-          />
+          >
+            {!getToken(to.type) && (
+              <StyledConnectButton size='sm'>
+                <StyledConnectLink href={to.href}>Connect</StyledConnectLink>
+              </StyledConnectButton>
+            )}
+          </PlatformBox>
         </StyledHeader>
         <StyledFooter>
           <Button size='lg' fullWidth>
@@ -78,6 +106,14 @@ const StyledFooter = styled.div`
 const StyledRotateIcon = styled.img`
   rotate: 90deg;
   height: 20px;
+`;
+
+const StyledConnectButton = styled(Button)`
+  margin-top: 12px;
+`;
+
+const StyledConnectLink = styled.a`
+  font-size: 0.8em;
 `;
 
 export default Home;
