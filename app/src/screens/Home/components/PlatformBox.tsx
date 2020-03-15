@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Cutout, Button } from 'react95';
+import { Cutout } from 'react95';
 
 type Props = {
   platform: string;
@@ -44,6 +44,7 @@ const StyledIcon = styled.img`
 const StyledLabelRow = styled.div`
   display: flex;
   align-items: center;
+  margin-bottom: 20px;
 `;
 
 const StyledLabel = styled.span`

@@ -10,18 +10,18 @@ type Props = {
 
 const AuthRedirect = ({ auth }: Props) => {
   const { setSpotifyToken, setYoutubeToken } = useContext(AuthContext);
-  const { code } = useAuthParams();
+  const { accessToken } = useAuthParams();
 
   useEffect(() => {
     switch (auth) {
       case 'spotify':
-        setSpotifyToken(code || '');
+        setSpotifyToken(accessToken || '');
         break;
       case 'youtube':
-        setYoutubeToken(code || '');
+        setYoutubeToken(accessToken || '');
         break;
     }
-  }, [auth, code, setSpotifyToken, setYoutubeToken]);
+  }, [auth, accessToken, setSpotifyToken, setYoutubeToken]);
 
   return <Redirect to='/' />;
 };

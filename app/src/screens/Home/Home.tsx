@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Window, WindowHeader, WindowContent, Button } from 'react95';
+import { Window, WindowHeader, WindowContent, Button, Select } from 'react95';
 
 import { refreshIcon } from '../../icons';
 import { capitalizeFirst } from '../../utils/string';
@@ -32,23 +32,15 @@ const Home = () => {
             platform={capitalizeFirst(from.type)}
             icon={from.icon}
           >
-            {!getToken(from.type) && (
-              <StyledConnectButton size='sm'>
+            {!getToken(from.type) ? (
+              <Button size='sm'>
                 <StyledConnectLink href={from.href}>Connect</StyledConnectLink>
-              </StyledConnectButton>
+              </Button>
+            ) : from.loading ? (
+              <StyledLoading>Loading...</StyledLoading>
+            ) : (
+              <StyledSelect items={from.playlists} />
             )}
-            <SelectDropdown
-              items={[
-                {
-                  label: 'Potatoe',
-                  onClick: () => {}
-                },
-                {
-                  label: 'More Potatoe',
-                  onClick: () => {}
-                }
-              ]}
-            />
           </PlatformBox>
           <StyledChangeOrderContainer>
             <Button onClick={onTogglePress}>
@@ -61,9 +53,9 @@ const Home = () => {
             icon={to.icon}
           >
             {!getToken(to.type) && (
-              <StyledConnectButton size='sm'>
+              <Button size='sm'>
                 <StyledConnectLink href={to.href}>Connect</StyledConnectLink>
-              </StyledConnectButton>
+              </Button>
             )}
           </PlatformBox>
         </StyledHeader>
@@ -108,11 +100,15 @@ const StyledRotateIcon = styled.img`
   height: 20px;
 `;
 
-const StyledConnectButton = styled(Button)`
-  margin-top: 12px;
+const StyledConnectLink = styled.a`
+  font-size: 0.8em;
 `;
 
-const StyledConnectLink = styled.a`
+const StyledSelect = styled(Select)`
+  width: 80%;
+`;
+
+const StyledLoading = styled.span`
   font-size: 0.8em;
 `;
 

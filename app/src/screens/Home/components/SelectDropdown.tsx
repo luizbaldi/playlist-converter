@@ -11,7 +11,7 @@ type Props = {
   items: DropdownItem[];
 };
 
-const Menu = ({ items }: Props) => {
+const SelectDropdown = ({ items }: Props) => {
   const [open, setOpen] = useState(false);
 
   const toggle = () => {
@@ -24,22 +24,21 @@ const Menu = ({ items }: Props) => {
 
   return (
     <StyledContainer>
-      <Button onClick={toggle} active={open}>
+      <Button onClick={toggle} active={open} size='sm'>
         <span>Select Playlist</span>
       </Button>
       {open && (
-        <List
+        <StyledList
           horizontalAlign='right'
           verticalAlign='bottom'
           onClick={handleClose}
-          style={{ zIndex: 1 }}
         >
           {items.map((item, i) => (
             <ListItem key={i} onClick={item.onClick} size='lg'>
               {item.label}
             </ListItem>
           ))}
-        </List>
+        </StyledList>
       )}
     </StyledContainer>
   );
@@ -50,4 +49,10 @@ const StyledContainer = styled.div`
   display: inline-block;
 `;
 
-export default Menu;
+const StyledList = styled(List)`
+  z-index: 1;
+  max-height: 40vh;
+  overflow-y: scroll;
+`;
+
+export default SelectDropdown;

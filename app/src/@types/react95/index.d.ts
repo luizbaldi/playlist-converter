@@ -105,4 +105,19 @@ declare module 'react95' {
     children?: ReactNode;
     onClick?: () => void;
   }>;
+
+  export const Select: FunctionComponent<{
+    items: {
+      label: string;
+      value: string | number;
+    }[];
+    className?: string;
+    width?: string | number;
+    height?: number;
+    selectedIndex?: number;
+    shadow?: boolean;
+    variant?: 'default' | 'flat';
+    style?: object;
+    onChange?: (value: string | number) => void;
+  }>;
 }
