@@ -1,24 +1,41 @@
-import React from 'react';
-import styled from 'styled-components';
-import { Window, WindowHeader, WindowContent, Button, Select } from 'react95';
+import React from "react";
+import styled from "styled-components";
+import {
+  Window,
+  WindowHeader,
+  WindowContent,
+  Button,
+  Select,
+  TextField
+} from "react95";
 
-import { refreshIcon } from '../../icons';
-import { capitalizeFirst } from '../../utils/string';
+import { refreshIcon } from "../../icons";
+import { capitalizeFirst } from "../../utils/string";
 
-import usePlatform from './usePlatform';
-import PlatformBox from './components/PlatformBox';
-import SelectDropdown from './components/SelectDropdown';
+import usePlatform from "./usePlatform";
+import PlatformBox from "./components/PlatformBox";
 
 const Home = () => {
-  const { youtubeToken, spotifyToken, from, to, onTogglePress } = usePlatform();
+  const {
+    youtubeToken,
+    spotifyToken,
+    from,
+    to,
+    onTogglePress,
+    playlistName,
+    onPlaylistNameChange,
+    playlists
+  } = usePlatform();
 
   const getToken = (type: string) => {
-    if (type === 'spotify') {
+    if (type === "spotify") {
       return spotifyToken;
     }
 
     return youtubeToken;
   };
+
+  console.log({ youtubeToken, spotifyToken });
 
   return (
     <Window>
@@ -28,39 +45,48 @@ const Home = () => {
       <WindowContent>
         <StyledHeader>
           <PlatformBox
-            label='From:'
+            label="From:"
             platform={capitalizeFirst(from.type)}
             icon={from.icon}
           >
-            {!getToken(from.type) ? (
-              <Button size='sm'>
+            {!getToken(from.type) && (
+              <Button>
                 <StyledConnectLink href={from.href}>Connect</StyledConnectLink>
               </Button>
-            ) : from.loading ? (
-              <StyledLoading>Loading...</StyledLoading>
-            ) : (
-              <StyledSelect items={from.playlists} />
             )}
+            {getToken(from.type) &&
+              (playlists.loading ? (
+                <StyledLoading>Loading...</StyledLoading>
+              ) : (
+                <StyledSelect items={playlists.items} />
+              ))}
           </PlatformBox>
           <StyledChangeOrderContainer>
             <Button onClick={onTogglePress}>
-              <StyledRotateIcon src={refreshIcon} alt='Refresh icon' />
+              <StyledRotateIcon src={refreshIcon} alt="Refresh icon" />
             </Button>
           </StyledChangeOrderContainer>
           <PlatformBox
-            label='To:'
+            label="To:"
             platform={capitalizeFirst(to.type)}
             icon={to.icon}
           >
-            {!getToken(to.type) && (
-              <Button size='sm'>
+            {!getToken(to.type) ? (
+              <Button>
                 <StyledConnectLink href={to.href}>Connect</StyledConnectLink>
               </Button>
+            ) : (
+              <TextField
+                placeholder="Your playlist name"
+                width="80%"
+                onChange={onPlaylistNameChange}
+                value={playlistName}
+              />
             )}
           </PlatformBox>
         </StyledHeader>
         <StyledFooter>
-          <Button size='lg' fullWidth>
+          <Button size="lg" fullWidth>
             Convert
           </Button>
         </StyledFooter>
@@ -101,7 +127,7 @@ const StyledRotateIcon = styled.img`
 `;
 
 const StyledConnectLink = styled.a`
-  font-size: 0.8em;
+  font-size: 0.9em;
 `;
 
 const StyledSelect = styled(Select)`

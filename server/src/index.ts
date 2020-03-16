@@ -1,122 +1,38 @@
-import express, { Request, Response } from 'express';
-import dotenv from 'dotenv';
-import querystring from 'querystring';
-import { google } from 'googleapis';
-import request from 'request';
+import express, { Request, Response } from "express";
 
-import { SpotifyUserInfoBody, SpotifyPlaylistsBody } from './types';
+import { spotifyLogin, spotifyCallback, getSpotifyPlaylists } from "./spotify";
+import { youtubeLogin, youtubeCallback, getYoutubePlaylists } from "./youtube";
 
-dotenv.config();
 const app = express();
 
-const {
-  SPOTIFY_CLIENT_ID: spotifyClientId,
-  SPOTIFY_CLIENT_SECRET: spotifyClientSecret,
-  SPOTIFY_REDIRECT_URI: spotifyRedirectUrl,
-  YOUTUBE_API_KEY: youtubeApiKey,
-  YOUTUBE_CLIENT_ID: youtubeClientId,
-  YOUTUBE_SECRET_KEY: youtubeSecretKey,
-  YOUTUBE_REDIRECT_URL: youtubeRedirectUrl,
-  FRONTEND_URI: frontendUri
-} = process.env;
-
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', ['http://localhost:3000']);
+  res.header("Access-Control-Allow-Origin", ["http://localhost:3000"]);
   res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
   );
   next();
 });
 
-app.get('/spotify-login', (req: Request, res: Response) => {
-  const params = querystring.stringify({
-    response_type: 'code',
-    client_id: spotifyClientId,
-    redirect_uri: spotifyRedirectUrl,
-    scope: 'playlist-read-private playlist-read-collaborative'
-  });
+/* spotify routes */
+app.get("/spotify-login", spotifyLogin);
+app.get("/spotify-callback", spotifyCallback);
 
-  res.redirect(`https://accounts.spotify.com/authorize?${params}`);
-});
+/* youtube routes */
+app.get("/youtube-login", youtubeLogin);
+app.get("/yt-callback", youtubeCallback);
 
-app.get('/spotify-callback', (req: Request, res: Response) => {
-  const code = req.query.code || null;
-  const authOptions = {
-    url: 'https://accounts.spotify.com/api/token',
-    form: {
-      code,
-      redirect_uri: spotifyRedirectUrl,
-      grant_type: 'authorization_code'
-    },
-    headers: {
-      Authorization: `Basic ${new Buffer(
-        `${spotifyClientId}:${spotifyClientSecret}`
-      ).toString('base64')}`
-    },
-    json: true
-  };
+/* generic routes */
+app.get("/get-playlists", (req: Request, res: Response) => {
+  const { access_token: accessToken, type } = req.query;
 
-  request.post(authOptions, (error, response, body) => {
-    const { access_token } = body;
-
-    res.redirect(`${frontendUri}/spotify-auth?access_token=${access_token}`);
-  });
-});
-
-app.get('/youtube-login', (req: Request, res: Response) => {
-  const oAuthConn = new google.auth.OAuth2(
-    youtubeClientId,
-    youtubeSecretKey,
-    youtubeRedirectUrl
-  );
-
-  const connectionUrl = oAuthConn.generateAuthUrl({
-    prompt: 'consent',
-    scope: ['https://www.googleapis.com/auth/youtube']
-  });
-
-  res.redirect(connectionUrl);
-});
-
-app.get('/get-playlists', async (req: Request, res: Response) => {
-  const { access_token, type } = req.query;
-
-  if (type === 'spotify') {
-    const baseUrl = 'https://api.spotify.com/v1';
-    const options = {
-      url: `${baseUrl}/me`,
-      headers: { Authorization: 'Bearer ' + access_token },
-      json: true
-    };
-
-    request.get(options, (error, response, body: SpotifyUserInfoBody) => {
-      const { id } = body;
-
-      request.get(
-        {
-          url: `${baseUrl}/users/${id}/playlists`,
-          headers: { Authorization: `Bearer ${access_token}` },
-          json: true
-        },
-        (_, response, body: SpotifyPlaylistsBody) => {
-          const { error, items = [] } = body;
-
-          if (error) {
-            res.status(401).send({ message: error.message });
-            return;
-          }
-
-          const userPlaylists = items.map(({ name, id }) => ({
-            name,
-            id
-          }));
-
-          res.send(userPlaylists);
-        }
-      );
-    });
+  if (type === "spotify") {
+    getSpotifyPlaylists(accessToken, res);
+  } else {
+    getYoutubePlaylists(accessToken, res);
   }
 });
 
-app.listen(4000);
+app.listen(4000, () => {
+  console.log("Server started at port 4000");
+});

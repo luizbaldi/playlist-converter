@@ -1,57 +1,73 @@
-import { useContext, useCallback, useState, useEffect } from 'react';
-import axios from 'axios';
+import {
+  useContext,
+  useCallback,
+  useState,
+  useEffect,
+  ChangeEvent
+} from "react";
+import axios from "axios";
 
-import { spotifyIcon, youtubeIcon } from '../../icons';
-import { AuthContext } from '../../contexts';
+import { spotifyIcon, youtubeIcon } from "../../icons";
+import { AuthContext } from "../../contexts";
 
-import { GetPlaylistResponse } from '../../../../server/src/types';
+import { GetPlaylistResponse } from "../../../../server/src/types";
 
-const baseUrl = 'http://localhost:4000';
+const baseUrl = "http://localhost:4000";
+
+type Playlists = {
+  loading: boolean;
+  items: { label: string; value: string }[];
+};
 
 export type PlatformSource = {
   token: string;
-  type: 'youtube' | 'spotify';
+  type: "youtube" | "spotify";
   icon: string;
   href: string;
-  playlists: { label: string; value: string }[];
-  playlistName?: string;
-  loading: boolean;
 };
 
 const usePlatformReducer = () => {
   const [from, setFrom] = useState<PlatformSource>({
-    token: '',
-    type: 'spotify',
+    token: "",
+    type: "spotify",
     icon: spotifyIcon,
-    href: `${baseUrl}/spotify-login`,
-    loading: false,
-    playlists: []
+    href: `${baseUrl}/spotify-login`
   });
 
   const [to, setTo] = useState<PlatformSource>({
-    token: '',
-    type: 'youtube',
+    token: "",
+    type: "youtube",
     icon: youtubeIcon,
-    href: `${baseUrl}/youtube-login`,
-    loading: false,
-    playlists: []
+    href: `${baseUrl}/youtube-login`
   });
 
-  const { spotifyToken, youtubeToken, setSpotifyToken } = useContext(
-    AuthContext
-  );
+  const [playlists, setPlaylists] = useState<Playlists>({
+    loading: false,
+    items: []
+  });
+
+  const [playlistName, setPlaylistName] = useState("");
+
+  const {
+    spotifyToken,
+    youtubeToken,
+    setSpotifyToken,
+    setYoutubeToken
+  } = useContext(AuthContext);
 
   const onTogglePress = useCallback(() => {
     setFrom(to);
     setTo(from);
   }, [to, from]);
 
-  const fetchSpotifyPlaylists = async () => {
-    if (!spotifyToken) return;
+  const fetchPlaylists = async () => {
+    const currentToken = from.type === "spotify" ? spotifyToken : youtubeToken;
+
+    if (!currentToken) return;
 
     try {
-      setFrom({
-        ...from,
+      setPlaylists({
+        ...playlists,
         loading: true
       });
 
@@ -59,41 +75,47 @@ const usePlatformReducer = () => {
         `${baseUrl}/get-playlists`,
         {
           params: {
-            access_token: spotifyToken,
-            type: 'spotify'
+            access_token: currentToken,
+            type: from.type
           }
         }
       );
 
-      const newFrom = {
-        ...from,
-        playlists: data.map(({ name, id }) => ({
+      setPlaylists({
+        loading: false,
+        items: data.map(({ name, id }) => ({
           label: name,
           value: id
-        })),
-        loading: false
-      };
-
-      setFrom(newFrom);
+        }))
+      });
     } catch (error) {
-      alert('Your token has expired, please reconnect.');
-      setSpotifyToken('');
+      alert("Your token has expired, please reconnect.");
+
+      if (from.type === "spotify") {
+        setSpotifyToken("");
+      } else {
+        setYoutubeToken("");
+      }
     }
   };
 
+  const onPlaylistNameChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setPlaylistName(e.target.value);
+  };
+
   useEffect(() => {
-    if (from.type === 'spotify') {
-      fetchSpotifyPlaylists();
-      return;
-    }
+    fetchPlaylists();
   }, [to, spotifyToken, youtubeToken]);
 
   return {
     spotifyToken,
     youtubeToken,
-    from: from,
-    to: to,
-    onTogglePress
+    from,
+    to,
+    onTogglePress,
+    playlistName,
+    onPlaylistNameChange,
+    playlists
   };
 };
 

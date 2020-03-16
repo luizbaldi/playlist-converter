@@ -1,5 +1,5 @@
-declare module 'react95' {
-  import { ReactNode, FunctionComponent } from 'react';
+declare module "react95" {
+  import { ReactNode, FunctionComponent } from "react";
 
   interface Theme {
     hatchedBackground: string;
@@ -77,10 +77,10 @@ declare module 'react95' {
     style?: object;
     disabled?: boolean;
     fullWidth?: boolean;
-    size?: 'sm' | 'md' | 'lg';
+    size?: "sm" | "md" | "lg";
     square?: boolean;
     active?: boolean;
-    variant?: 'default' | 'menu' | 'flat';
+    variant?: "default" | "menu" | "flat";
     className?: string;
   }>;
 
@@ -91,15 +91,15 @@ declare module 'react95' {
     inline?: boolean;
     shadow?: boolean;
     children?: ReactNode;
-    verticalAlign?: 'top' | 'bottom';
-    horizontalAlign?: 'left' | 'right';
+    verticalAlign?: "top" | "bottom";
+    horizontalAlign?: "left" | "right";
     onClick?: () => void;
   }>;
 
   export const ListItem: FunctionComponent<{
     className?: string;
     style?: object;
-    size?: 'sm' | 'md' | 'lg';
+    size?: "sm" | "md" | "lg";
     disabled?: boolean;
     square?: boolean;
     children?: ReactNode;
@@ -116,8 +116,21 @@ declare module 'react95' {
     height?: number;
     selectedIndex?: number;
     shadow?: boolean;
-    variant?: 'default' | 'flat';
+    variant?: "default" | "flat";
     style?: object;
     onChange?: (value: string | number) => void;
+  }>;
+
+  export const TextField: FunctionComponent<{
+    width?: string | number;
+    onChange?: (event: any) => void;
+    disabled?: boolean;
+    variant?: "default" | "flat";
+    shadow?: boolean;
+    type?: string;
+    className?: string;
+    style?: object;
+    placeholder?: string;
+    value?: string;
   }>;
 }
