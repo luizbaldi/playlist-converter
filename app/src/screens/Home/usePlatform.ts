@@ -1,26 +1,19 @@
-import {
-  useContext,
-  useCallback,
-  useState,
-  useEffect,
-  ChangeEvent
-} from "react";
-import axios from "axios";
+import { useContext, useCallback, useState, useEffect } from "react";
 
 import { spotifyIcon, youtubeIcon } from "../../icons";
 import { AuthContext } from "../../contexts";
+import api, { baseUrl } from "../../utils/api";
 
 import { GetPlaylistResponse } from "../../../../server/src/types";
 
-const baseUrl = "http://localhost:4000";
+type Playlist = { label: string; value: string };
 
 type Playlists = {
   loading: boolean;
-  items: { label: string; value: string }[];
+  items: Playlist[];
 };
 
 export type PlatformSource = {
-  token: string;
   type: "youtube" | "spotify";
   icon: string;
   href: string;
@@ -28,14 +21,12 @@ export type PlatformSource = {
 
 const usePlatformReducer = () => {
   const [from, setFrom] = useState<PlatformSource>({
-    token: "",
     type: "spotify",
     icon: spotifyIcon,
     href: `${baseUrl}/spotify-login`
   });
 
   const [to, setTo] = useState<PlatformSource>({
-    token: "",
     type: "youtube",
     icon: youtubeIcon,
     href: `${baseUrl}/youtube-login`
@@ -45,8 +36,6 @@ const usePlatformReducer = () => {
     loading: false,
     items: []
   });
-
-  const [playlistName, setPlaylistName] = useState("");
 
   const {
     spotifyToken,
@@ -71,15 +60,12 @@ const usePlatformReducer = () => {
         loading: true
       });
 
-      const { data } = await axios.get<GetPlaylistResponse>(
-        `${baseUrl}/get-playlists`,
-        {
-          params: {
-            access_token: currentToken,
-            type: from.type
-          }
+      const { data } = await api.get<GetPlaylistResponse>(`/get-playlists`, {
+        params: {
+          access_token: currentToken,
+          type: from.type
         }
-      );
+      });
 
       setPlaylists({
         loading: false,
@@ -99,10 +85,6 @@ const usePlatformReducer = () => {
     }
   };
 
-  const onPlaylistNameChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setPlaylistName(e.target.value);
-  };
-
   useEffect(() => {
     fetchPlaylists();
   }, [to, spotifyToken, youtubeToken]);
@@ -113,8 +95,6 @@ const usePlatformReducer = () => {
     from,
     to,
     onTogglePress,
-    playlistName,
-    onPlaylistNameChange,
     playlists
   };
 };

@@ -43,19 +43,35 @@ type SpotifyPlaylistItem = {
   uri: string;
 };
 
+type BodyError = {
+  status: number;
+  message: string;
+};
+
 export type SpotifyPlaylistsBody = {
   href?: string;
   items?: SpotifyPlaylistItem[];
   limit?: number;
   offset?: number;
   total?: number;
-  error?: {
-    status: number;
-    message: string;
-  };
+  error?: BodyError;
 };
 
 export type GetPlaylistResponse = {
   name: string;
   id: string;
 }[];
+
+export type SpotifyTracksBody = {
+  items: {
+    track: {
+      id: string;
+      name: string;
+      artists: {
+        id: string;
+        name: string;
+      }[];
+    };
+  }[];
+  error?: BodyError;
+};

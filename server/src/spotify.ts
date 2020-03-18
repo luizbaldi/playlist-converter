@@ -3,7 +3,11 @@ import querystring from "querystring";
 import request from "request";
 import dotenv from "dotenv";
 
-import { SpotifyUserInfoBody, SpotifyPlaylistsBody } from "./types";
+import {
+  SpotifyUserInfoBody,
+  SpotifyPlaylistsBody,
+  SpotifyTracksBody
+} from "./types";
 
 dotenv.config();
 
@@ -14,7 +18,7 @@ const {
   FRONTEND_URI: frontendUri
 } = process.env;
 
-console.log(process.env);
+const baseApiUrl = "https://api.spotify.com/v1";
 
 export const spotifyLogin = (req: Request, res: Response) => {
   const params = querystring.stringify({
@@ -52,9 +56,8 @@ export const spotifyCallback = (req: Request, res: Response) => {
 };
 
 export const getSpotifyPlaylists = (accessToken: string, res: Response) => {
-  const baseUrl = "https://api.spotify.com/v1";
   const options = {
-    url: `${baseUrl}/me`,
+    url: `${baseApiUrl}/me`,
     headers: { Authorization: `Bearer ${accessToken}` },
     json: true
   };
@@ -66,7 +69,7 @@ export const getSpotifyPlaylists = (accessToken: string, res: Response) => {
 
       request.get(
         {
-          url: `${baseUrl}/users/${userId}/playlists`,
+          url: `${baseApiUrl}/users/${userId}/playlists`,
           headers: { Authorization: `Bearer ${accessToken}` },
           json: true
         },
@@ -93,3 +96,34 @@ export const getSpotifyPlaylists = (accessToken: string, res: Response) => {
     }
   );
 };
+
+export const getSpotifyPlaylistSongs = (
+  accessToken: string,
+  playlistId: string
+): Promise<{ id: string; name: string }[]> =>
+  new Promise((resolve, reject) => {
+    request.get(
+      {
+        url: `${baseApiUrl}/playlists/${playlistId}/tracks?fields=items`,
+        headers: { Authorization: `Bearer ${accessToken}` },
+        json: true
+      },
+      (playlistsError, playlistsResponse, playlistsBody: SpotifyTracksBody) => {
+        const { error, items = [] } = playlistsBody;
+
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        const songs = items.map(({ track }) => ({
+          id: track.id,
+          name: `${track.name} - ${track.artists
+            .map(({ name }) => name)
+            .join(" - ")}`
+        }));
+
+        resolve(songs);
+      }
+    );
+  });

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ChangeEvent, useState } from "react";
 import styled from "styled-components";
 import {
   Window,
@@ -11,6 +11,7 @@ import {
 
 import { refreshIcon } from "../../icons";
 import { capitalizeFirst } from "../../utils/string";
+import api from "../../utils/api";
 
 import usePlatform from "./usePlatform";
 import PlatformBox from "./components/PlatformBox";
@@ -22,10 +23,19 @@ const Home = () => {
     from,
     to,
     onTogglePress,
-    playlistName,
-    onPlaylistNameChange,
     playlists
   } = usePlatform();
+
+  const [playlistDestination, setPlaylistDestination] = useState("");
+  const [currentPlaylist, setCurrentPlaylist] = useState<string | null>(null);
+
+  const onPlaylistDestinationChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setPlaylistDestination(e.target.value);
+  };
+
+  const onCurrentPlaylistChange = (id: string | number) => {
+    setCurrentPlaylist(id.toString());
+  };
 
   const getToken = (type: string) => {
     if (type === "spotify") {
@@ -35,7 +45,31 @@ const Home = () => {
     return youtubeToken;
   };
 
-  console.log({ youtubeToken, spotifyToken });
+  const convertPlaylist = () => {
+    if (!youtubeToken && !spotifyToken) {
+      alert("Please, log in to both platforms before starting conversion");
+      return;
+    }
+
+    if (!youtubeToken) {
+      alert(`Please, log in to youtube to continue :)`);
+      return;
+    }
+
+    if (!spotifyToken) {
+      alert(`Please, log in to spotify to continue :)`);
+      return;
+    }
+
+    const params = {
+      destinationPlaylistName: playlistDestination,
+      originToken: from.type === "spotify" ? spotifyToken : youtubeToken,
+      originPlatform: from.type,
+      originPlaylistId: currentPlaylist
+    };
+
+    api.get("/convert-playlist", { params });
+  };
 
   return (
     <Window>
@@ -58,7 +92,10 @@ const Home = () => {
               (playlists.loading ? (
                 <StyledLoading>Loading...</StyledLoading>
               ) : (
-                <StyledSelect items={playlists.items} />
+                <StyledSelect
+                  items={playlists.items}
+                  onChange={onCurrentPlaylistChange}
+                />
               ))}
           </PlatformBox>
           <StyledChangeOrderContainer>
@@ -79,14 +116,14 @@ const Home = () => {
               <TextField
                 placeholder="Your playlist name"
                 width="80%"
-                onChange={onPlaylistNameChange}
-                value={playlistName}
+                onChange={onPlaylistDestinationChange}
+                value={playlistDestination}
               />
             )}
           </PlatformBox>
         </StyledHeader>
         <StyledFooter>
-          <Button size="lg" fullWidth>
+          <Button size="lg" onClick={convertPlaylist} fullWidth>
             Convert
           </Button>
         </StyledFooter>

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { google } from "googleapis";
+import { google, logging_v2 } from "googleapis";
 import querystring from "querystring";
 import dotenv from "dotenv";
 
@@ -48,17 +48,42 @@ export const getYoutubePlaylists = async (
     access_token: accessToken
   });
 
-  const {
-    data: { items = [] }
-  } = await youtubeClient.playlists.list({
-    part: "id,snippet",
-    mine: true
+  try {
+    const {
+      data: { items = [] }
+    } = await youtubeClient.playlists.list({
+      part: "id,snippet",
+      mine: true
+    });
+
+    res.send(
+      items.map(({ id, snippet }) => ({
+        id,
+        name: snippet?.title
+      }))
+    );
+  } catch (error) {
+    res.status(401).send({ message: error.message });
+  }
+};
+
+export const getYoutubePlaylistSongs = async (
+  accessToken: string,
+  playlistId: string
+) => {
+  youtubeOAuthClient.setCredentials({
+    access_token: accessToken
   });
 
-  res.send(
-    items.map(({ id, snippet }) => ({
-      id,
-      name: snippet?.title
-    }))
-  );
+  const {
+    data: { items = [] }
+  } = await youtubeClient.playlistItems.list({
+    playlistId,
+    part: "id,snippet"
+  });
+
+  return items.map(({ id, snippet }) => ({
+    id: id || "",
+    name: snippet?.title || ""
+  }));
 };

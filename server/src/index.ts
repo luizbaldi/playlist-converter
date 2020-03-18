@@ -1,7 +1,8 @@
-import express, { Request, Response } from "express";
+import express from "express";
 
-import { spotifyLogin, spotifyCallback, getSpotifyPlaylists } from "./spotify";
-import { youtubeLogin, youtubeCallback, getYoutubePlaylists } from "./youtube";
+import { spotifyLogin, spotifyCallback } from "./spotify";
+import { youtubeLogin, youtubeCallback } from "./youtube";
+import { getPlaylists, convertPlaylist } from "./playlists";
 
 const app = express();
 
@@ -23,15 +24,8 @@ app.get("/youtube-login", youtubeLogin);
 app.get("/yt-callback", youtubeCallback);
 
 /* generic routes */
-app.get("/get-playlists", (req: Request, res: Response) => {
-  const { access_token: accessToken, type } = req.query;
-
-  if (type === "spotify") {
-    getSpotifyPlaylists(accessToken, res);
-  } else {
-    getYoutubePlaylists(accessToken, res);
-  }
-});
+app.get("/get-playlists", getPlaylists);
+app.get("/convert-playlist", convertPlaylist);
 
 app.listen(4000, () => {
   console.log("Server started at port 4000");
