@@ -63,7 +63,8 @@ const Home = () => {
 
     const params = {
       destinationPlaylistName: playlistDestination,
-      originToken: from.type === "spotify" ? spotifyToken : youtubeToken,
+      spotifyToken,
+      youtubeToken,
       originPlatform: from.type,
       originPlaylistId: currentPlaylist
     };

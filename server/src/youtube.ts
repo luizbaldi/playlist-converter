@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
-import { google, logging_v2 } from "googleapis";
+import { google } from "googleapis";
 import querystring from "querystring";
 import dotenv from "dotenv";
+
+import { Songs } from "./types";
 
 dotenv.config();
 
@@ -70,7 +72,7 @@ export const getYoutubePlaylists = async (
 export const getYoutubePlaylistSongs = async (
   accessToken: string,
   playlistId: string
-) => {
+): Promise<Songs> => {
   youtubeOAuthClient.setCredentials({
     access_token: accessToken
   });
@@ -86,4 +88,31 @@ export const getYoutubePlaylistSongs = async (
     id: id || "",
     name: snippet?.title || ""
   }));
+};
+
+export const createYoutubePlaylist = async (
+  accessToken: string,
+  playlistName: string
+): Promise<string> => {
+  youtubeOAuthClient.setCredentials({
+    access_token: accessToken
+  });
+  try {
+    const {
+      data: { id: playlistId }
+      // for some reason this lib is not in accordance with the docs :(
+      // @ts-ignore
+    } = await youtubeClient.playlists.insert({
+      part: "snippet, status",
+      resource: {
+        snippet: {
+          title: playlistName
+        }
+      }
+    });
+
+    return playlistId;
+  } catch (error) {
+    throw new Error("Error creating youtube playlist :(");
+  }
 };

@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
 import querystring from "querystring";
-import request from "request";
+import request, { RequestCallback } from "request";
 import dotenv from "dotenv";
 
 import {
   SpotifyUserInfoBody,
   SpotifyPlaylistsBody,
-  SpotifyTracksBody
+  SpotifyTracksBody,
+  Songs
 } from "./types";
 
 dotenv.config();
@@ -25,7 +26,8 @@ export const spotifyLogin = (req: Request, res: Response) => {
     response_type: "code",
     client_id: spotifyClientId,
     redirect_uri: spotifyRedirectUrl,
-    scope: "playlist-read-private playlist-read-collaborative"
+    scope:
+      "playlist-read-private playlist-read-collaborative playlist-modify-public"
   });
 
   res.redirect(`https://accounts.spotify.com/authorize?${params}`);
@@ -55,15 +57,22 @@ export const spotifyCallback = (req: Request, res: Response) => {
   });
 };
 
-export const getSpotifyPlaylists = (accessToken: string, res: Response) => {
+const getUserInfo = (
+  accessToken: string,
+  onRequestCallback: RequestCallback
+) => {
   const options = {
     url: `${baseApiUrl}/me`,
     headers: { Authorization: `Bearer ${accessToken}` },
     json: true
   };
 
-  request.get(
-    options,
+  request.get(options, onRequestCallback);
+};
+
+export const getSpotifyPlaylists = (accessToken: string, res: Response) => {
+  getUserInfo(
+    accessToken,
     (userError, userResponse, userBody: SpotifyUserInfoBody) => {
       const { id: userId } = userBody;
 
@@ -100,8 +109,7 @@ export const getSpotifyPlaylists = (accessToken: string, res: Response) => {
 export const getSpotifyPlaylistSongs = (
   accessToken: string,
   playlistId: string
-): Promise<{ id: string; name: string }[]> =>
-  new Promise((resolve, reject) => {
+): Promise<Songs> => new Promise((resolve, reject) => {
     request.get(
       {
         url: `${baseApiUrl}/playlists/${playlistId}/tracks?fields=items`,
@@ -126,4 +134,34 @@ export const getSpotifyPlaylistSongs = (
         resolve(songs);
       }
     );
+  });
+
+export const createSpotifyPlaylist = (
+  accessToken: string,
+  playlistName: string
+): Promise<string> => new Promise((resolve, reject) => {
+    getUserInfo(accessToken, (error, response, body: SpotifyUserInfoBody) => {
+      const { id: userId } = body;
+
+      request.post(
+        {
+          url: `${baseApiUrl}/users/${userId}/playlists`,
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          },
+          form: JSON.stringify({ name: playlistName }),
+          json: true
+        },
+        (playlistError, playlistResponse, playlistBody) => {
+          if (playlistError || playlistBody.error) {
+            reject(new Error("Error creating spotify playlist :("));
+            return;
+          }
+
+          const { id } = playlistBody;
+
+          resolve(id);
+        }
+      );
+    });
   });

@@ -75,7 +75,7 @@ const usePlatformReducer = () => {
         }))
       });
     } catch (error) {
-      alert("Your token has expired, please reconnect.");
+      alert(`Your ${from.type} token has expired, please reconnect.`);
 
       if (from.type === "spotify") {
         setSpotifyToken("");

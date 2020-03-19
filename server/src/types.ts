@@ -75,3 +75,8 @@ export type SpotifyTracksBody = {
   }[];
   error?: BodyError;
 };
+
+export type Songs = {
+  id: string;
+  name: string;
+}[];

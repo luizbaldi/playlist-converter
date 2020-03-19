@@ -1,12 +1,22 @@
 import { Request, Response } from "express";
 
-import { getSpotifyPlaylists, getSpotifyPlaylistSongs } from "./spotify";
-import { getYoutubePlaylists, getYoutubePlaylistSongs } from "./youtube";
+import {
+  getSpotifyPlaylists,
+  getSpotifyPlaylistSongs,
+  createSpotifyPlaylist
+} from "./spotify";
+
+import {
+  getYoutubePlaylists,
+  getYoutubePlaylistSongs,
+  createYoutubePlaylist
+} from "./youtube";
 
 type ConvertPlaylistParams = {
   originPlatform: "youtube" | "spotify";
   destinationPlaylistName: string;
-  originToken: string;
+  youtubeToken: string;
+  spotifyToken: string;
   originPlaylistId: string;
 };
 
@@ -22,16 +32,21 @@ export const getPlaylists = (req: Request, res: Response) => {
 
 export const convertPlaylist = async (req: Request, res: Response) => {
   const {
-    originToken,
     originPlaylistId,
     originPlatform,
-    destinationPlaylistName
+    destinationPlaylistName,
+    youtubeToken,
+    spotifyToken
   }: ConvertPlaylistParams = req.query;
 
   const songs =
     originPlatform === "spotify"
-      ? await getSpotifyPlaylistSongs(originToken, originPlaylistId)
-      : await getYoutubePlaylistSongs(originToken, originPlaylistId);
+      ? await getSpotifyPlaylistSongs(spotifyToken, originPlaylistId)
+      : await getYoutubePlaylistSongs(youtubeToken, originPlaylistId);
 
-  console.log(songs);
+  /* eslint-disable @typescript-eslint/no-unused-expressions */
+  const newPlaylistId =
+    originPlatform === "youtube"
+      ? await createSpotifyPlaylist(spotifyToken, destinationPlaylistName)
+      : await createYoutubePlaylist(youtubeToken, destinationPlaylistName);
 };
