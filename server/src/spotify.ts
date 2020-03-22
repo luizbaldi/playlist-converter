@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import querystring from "querystring";
 import request, { RequestCallback } from "request";
 import dotenv from "dotenv";
+import axios from "axios";
 
 import {
   SpotifyUserInfoBody,
@@ -9,6 +10,8 @@ import {
   SpotifyTracksBody,
   Songs
 } from "./types";
+
+import { TrackSearchResponse, PlaylistSnapshotResponse } from "./types/spotify";
 
 dotenv.config();
 
@@ -165,3 +168,38 @@ export const createSpotifyPlaylist = (
       );
     });
   });
+
+export const convertToSpotify = async (
+  accessToken: string,
+  songs: Songs,
+  playlistId: string
+) => {
+  const requestConfig = {
+    headers: { Authorization: `Bearer ${accessToken}` }
+  };
+
+  const spotifySongs = await Promise.all(
+    songs.map(({ name }) => {
+      const params = querystring.stringify({
+        type: "track",
+        q: name,
+        limit: 1
+      });
+
+      return axios.get<TrackSearchResponse>(
+        `${baseApiUrl}/search?${params}`,
+        requestConfig
+      );
+    })
+  );
+
+  const spotifySongsURIs = spotifySongs
+    .map(({ data }) => (data.tracks.items.length ? data.tracks.items[0].uri : null))
+    .filter((songId) => songId);
+
+  await axios.post<PlaylistSnapshotResponse>(
+    `${baseApiUrl}/playlists/${playlistId}/tracks`,
+    { uris: spotifySongsURIs },
+    requestConfig
+  );
+};

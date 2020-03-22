@@ -3,13 +3,15 @@ import { Request, Response } from "express";
 import {
   getSpotifyPlaylists,
   getSpotifyPlaylistSongs,
-  createSpotifyPlaylist
+  createSpotifyPlaylist,
+  convertToSpotify
 } from "./spotify";
 
 import {
   getYoutubePlaylists,
   getYoutubePlaylistSongs,
-  createYoutubePlaylist
+  createYoutubePlaylist,
+  convertToYoutube
 } from "./youtube";
 
 type ConvertPlaylistParams = {
@@ -39,14 +41,33 @@ export const convertPlaylist = async (req: Request, res: Response) => {
     spotifyToken
   }: ConvertPlaylistParams = req.query;
 
-  const songs =
-    originPlatform === "spotify"
-      ? await getSpotifyPlaylistSongs(spotifyToken, originPlaylistId)
-      : await getYoutubePlaylistSongs(youtubeToken, originPlaylistId);
+  try {
+    console.log({ originPlaylistId });
 
-  /* eslint-disable @typescript-eslint/no-unused-expressions */
-  const newPlaylistId =
-    originPlatform === "youtube"
-      ? await createSpotifyPlaylist(spotifyToken, destinationPlaylistName)
-      : await createYoutubePlaylist(youtubeToken, destinationPlaylistName);
+    const originPlatformSongs =
+      originPlatform === "spotify"
+        ? await getSpotifyPlaylistSongs(spotifyToken, originPlaylistId)
+        : await getYoutubePlaylistSongs(youtubeToken, originPlaylistId);
+
+    const newPlaylistId =
+      originPlatform === "spotify"
+        ? await createYoutubePlaylist(youtubeToken, destinationPlaylistName)
+        : await createSpotifyPlaylist(spotifyToken, destinationPlaylistName);
+
+    const destinationPlatformSongIds =
+      originPlatform === "spotify"
+        ? await convertToYoutube(
+            youtubeToken,
+            originPlatformSongs,
+            newPlaylistId
+          )
+        : await convertToSpotify(
+            spotifyToken,
+            originPlatformSongs,
+            newPlaylistId
+          );
+  } catch (error) {
+    console.log(error.message);
+    res.status(401).send({ message: error.message });
+  }
 };

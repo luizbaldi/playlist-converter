@@ -55,7 +55,8 @@ export const getYoutubePlaylists = async (
       data: { items = [] }
     } = await youtubeClient.playlists.list({
       part: "id,snippet",
-      mine: true
+      mine: true,
+      maxResults: 20
     });
 
     res.send(
@@ -97,6 +98,7 @@ export const createYoutubePlaylist = async (
   youtubeOAuthClient.setCredentials({
     access_token: accessToken
   });
+
   try {
     const {
       data: { id: playlistId }
@@ -113,6 +115,60 @@ export const createYoutubePlaylist = async (
 
     return playlistId;
   } catch (error) {
+    console.log(error.message);
     throw new Error("Error creating youtube playlist :(");
+  }
+};
+
+export const convertToYoutube = async (
+  accessToken: string,
+  songs: Songs,
+  playlistId: string
+) => {
+  youtubeOAuthClient.setCredentials({
+    access_token: accessToken
+  });
+
+  try {
+    const youtubeSearches = await Promise.all(
+      songs.map(({ name }) =>
+        youtubeClient.search.list({
+          part: "id",
+          q: name,
+          maxResults: 1
+        })
+      )
+    );
+
+    const youtubeSongIds = youtubeSearches
+      .map(({ data }) =>
+        data?.items?.length ? data.items[0].id?.videoId : null
+      )
+      .filter(songId => songId);
+
+    const response = (
+      await Promise.all(
+        youtubeSongIds.map(songId =>
+          // @ts-ignore
+          youtubeClient.playlistItems.insert({
+            part: "snippet",
+            resource: {
+              snippet: {
+                playlistId,
+                resourceId: {
+                  videoId: songId,
+                  kind: "youtube#video"
+                }
+              }
+            }
+          })
+        )
+      )
+    ).map(({ data }) => data);
+
+    console.log(response);
+  } catch (error) {
+    console.log("ERROR");
+    console.log(error.response);
   }
 };

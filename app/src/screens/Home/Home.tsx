@@ -45,7 +45,7 @@ const Home = () => {
     return youtubeToken;
   };
 
-  const convertPlaylist = () => {
+  const convertPlaylist = async () => {
     if (!youtubeToken && !spotifyToken) {
       alert("Please, log in to both platforms before starting conversion");
       return;
@@ -69,7 +69,17 @@ const Home = () => {
       originPlaylistId: currentPlaylist
     };
 
-    api.get("/convert-playlist", { params });
+    try {
+      const response = await api.get("/convert-playlist", { params });
+      console.log({ response });
+    } catch (error) {
+      const {
+        response: {
+          data: { message }
+        }
+      } = error;
+      alert(message || "Oops, something went wrong :(");
+    }
   };
 
   return (
