@@ -1,10 +1,10 @@
 const getPrefixedKey = (key: string) => {
-  const prefix = '@playlist-converter';
+  const prefix = "@playlist-converter";
 
   return `${prefix}/${key}`;
 };
 
-type Keys = 'spotifyToken' | 'youtubeToken';
+type Keys = "spotifyToken" | "youtubeToken";
 
 export default {
   set(key: Keys, value: string) {

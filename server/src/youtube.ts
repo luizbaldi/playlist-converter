@@ -146,27 +146,23 @@ export const convertToYoutube = async (
       )
       .filter(songId => songId);
 
-    const response = (
-      await Promise.all(
-        youtubeSongIds.map(songId =>
-          // @ts-ignore
-          youtubeClient.playlistItems.insert({
-            part: "snippet",
-            resource: {
-              snippet: {
-                playlistId,
-                resourceId: {
-                  videoId: songId,
-                  kind: "youtube#video"
-                }
+    await Promise.all(
+      youtubeSongIds.map(songId =>
+        // @ts-ignore
+        youtubeClient.playlistItems.insert({
+          part: "snippet",
+          resource: {
+            snippet: {
+              playlistId,
+              resourceId: {
+                videoId: songId,
+                kind: "youtube#video"
               }
             }
-          })
-        )
+          }
+        })
       )
-    ).map(({ data }) => data);
-
-    console.log(response);
+    );
   } catch (error) {
     console.log("ERROR");
     console.log(error.response);

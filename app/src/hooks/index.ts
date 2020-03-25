@@ -1,1 +1,1 @@
-export { default as useAuthParams } from './useAuthParams';
+export { default as useAuthParams } from "./useAuthParams";

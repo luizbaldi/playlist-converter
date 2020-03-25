@@ -112,7 +112,8 @@ export const getSpotifyPlaylists = (accessToken: string, res: Response) => {
 export const getSpotifyPlaylistSongs = (
   accessToken: string,
   playlistId: string
-): Promise<Songs> => new Promise((resolve, reject) => {
+): Promise<Songs> =>
+  new Promise((resolve, reject) => {
     request.get(
       {
         url: `${baseApiUrl}/playlists/${playlistId}/tracks?fields=items`,
@@ -142,7 +143,8 @@ export const getSpotifyPlaylistSongs = (
 export const createSpotifyPlaylist = (
   accessToken: string,
   playlistName: string
-): Promise<string> => new Promise((resolve, reject) => {
+): Promise<string> =>
+  new Promise((resolve, reject) => {
     getUserInfo(accessToken, (error, response, body: SpotifyUserInfoBody) => {
       const { id: userId } = body;
 
@@ -194,8 +196,10 @@ export const convertToSpotify = async (
   );
 
   const spotifySongsURIs = spotifySongs
-    .map(({ data }) => (data.tracks.items.length ? data.tracks.items[0].uri : null))
-    .filter((songId) => songId);
+    .map(({ data }) =>
+      data.tracks.items.length ? data.tracks.items[0].uri : null
+    )
+    .filter(songId => songId);
 
   await axios.post<PlaylistSnapshotResponse>(
     `${baseApiUrl}/playlists/${playlistId}/tracks`,

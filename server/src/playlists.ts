@@ -42,8 +42,6 @@ export const convertPlaylist = async (req: Request, res: Response) => {
   }: ConvertPlaylistParams = req.query;
 
   try {
-    console.log({ originPlaylistId });
-
     const originPlatformSongs =
       originPlatform === "spotify"
         ? await getSpotifyPlaylistSongs(spotifyToken, originPlaylistId)
@@ -54,18 +52,13 @@ export const convertPlaylist = async (req: Request, res: Response) => {
         ? await createYoutubePlaylist(youtubeToken, destinationPlaylistName)
         : await createSpotifyPlaylist(spotifyToken, destinationPlaylistName);
 
-    const destinationPlatformSongIds =
-      originPlatform === "spotify"
-        ? await convertToYoutube(
-            youtubeToken,
-            originPlatformSongs,
-            newPlaylistId
-          )
-        : await convertToSpotify(
-            spotifyToken,
-            originPlatformSongs,
-            newPlaylistId
-          );
+    if (originPlatform === "spotify") {
+      await convertToYoutube(youtubeToken, originPlatformSongs, newPlaylistId);
+    } else {
+      await convertToSpotify(spotifyToken, originPlatformSongs, newPlaylistId);
+    }
+
+    res.send("ok");
   } catch (error) {
     console.log(error.message);
     res.status(401).send({ message: error.message });

@@ -17,6 +17,9 @@ import usePlatform from "./usePlatform";
 import PlatformBox from "./components/PlatformBox";
 
 const Home = () => {
+  const [playlistDestination, setPlaylistDestination] = useState("");
+  const [currentPlaylist, setCurrentPlaylist] = useState<string | null>(null);
+
   const {
     youtubeToken,
     spotifyToken,
@@ -25,9 +28,6 @@ const Home = () => {
     onTogglePress,
     playlists
   } = usePlatform();
-
-  const [playlistDestination, setPlaylistDestination] = useState("");
-  const [currentPlaylist, setCurrentPlaylist] = useState<string | null>(null);
 
   const onPlaylistDestinationChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPlaylistDestination(e.target.value);
@@ -61,6 +61,16 @@ const Home = () => {
       return;
     }
 
+    if (!playlistDestination) {
+      alert("Please, type a playlist destination name to continue :)");
+      return;
+    }
+
+    if (!currentPlaylist) {
+      alert("Please, select a origni playlist to be converted :)");
+      return;
+    }
+
     const params = {
       destinationPlaylistName: playlistDestination,
       spotifyToken,
@@ -70,15 +80,13 @@ const Home = () => {
     };
 
     try {
-      const response = await api.get("/convert-playlist", { params });
-      console.log({ response });
+      await api.get("/convert-playlist", { params });
+
+      alert("Playlist successfully converted :)");
     } catch (error) {
-      const {
-        response: {
-          data: { message }
-        }
-      } = error;
-      alert(message || "Oops, something went wrong :(");
+      const message = error?.data?.message || "Oops, something went wrong :(";
+
+      alert(message);
     }
   };
 
@@ -111,7 +119,7 @@ const Home = () => {
           </PlatformBox>
           <StyledChangeOrderContainer>
             <Button onClick={onTogglePress}>
-              <StyledRotateIcon src={refreshIcon} alt="Refresh icon" />
+              <StyledRotateIcon src={refreshIcon} alt="Invert platforms icon" />
             </Button>
           </StyledChangeOrderContainer>
           <PlatformBox

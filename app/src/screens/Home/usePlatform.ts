@@ -49,44 +49,43 @@ const usePlatformReducer = () => {
     setTo(from);
   }, [to, from]);
 
-  const fetchPlaylists = async () => {
-    const currentToken = from.type === "spotify" ? spotifyToken : youtubeToken;
-
-    if (!currentToken) return;
-
-    try {
-      setPlaylists({
-        ...playlists,
-        loading: true
-      });
-
-      const { data } = await api.get<GetPlaylistResponse>(`/get-playlists`, {
-        params: {
-          access_token: currentToken,
-          type: from.type
-        }
-      });
-
-      setPlaylists({
-        loading: false,
-        items: data.map(({ name, id }) => ({
-          label: name,
-          value: id
-        }))
-      });
-    } catch (error) {
-      alert(`Your ${from.type} token has expired, please reconnect.`);
-
-      if (from.type === "spotify") {
-        setSpotifyToken("");
-      } else {
-        setYoutubeToken("");
-      }
-    }
-  };
-
   useEffect(() => {
-    fetchPlaylists();
+    (async () => {
+      const currentToken =
+        from.type === "spotify" ? spotifyToken : youtubeToken;
+
+      if (!currentToken) return;
+
+      try {
+        setPlaylists({
+          ...playlists,
+          loading: true
+        });
+
+        const { data } = await api.get<GetPlaylistResponse>(`/get-playlists`, {
+          params: {
+            access_token: currentToken,
+            type: from.type
+          }
+        });
+
+        setPlaylists({
+          loading: false,
+          items: data.map(({ name, id }) => ({
+            label: name,
+            value: id
+          }))
+        });
+      } catch (error) {
+        alert(`Your ${from.type} token has expired, please reconnect.`);
+
+        if (from.type === "spotify") {
+          setSpotifyToken("");
+        } else {
+          setYoutubeToken("");
+        }
+      }
+    })();
   }, [to, spotifyToken, youtubeToken]);
 
   return {

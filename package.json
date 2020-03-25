@@ -7,7 +7,9 @@
   "private": true,
   "scripts": {
     "start:app": "cd ./app && yarn start",
-    "start:server": "cd ./server && yarn dev"
+    "start:server": "cd ./server && yarn dev",
+    "lint:app": "eslint app/src --ext .ts --ext .tsx",
+    "lint:server": "eslint server/src --ext .ts"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.22.0",
