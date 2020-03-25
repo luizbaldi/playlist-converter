@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "dev": "nodemon ./src/index.ts",
-    "start": "node ./srv/index.ts",
+    "start": "node ./src/index.ts",
     "tsc": "tsc"
   },
   "dependencies": {

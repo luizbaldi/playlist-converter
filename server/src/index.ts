@@ -6,6 +6,8 @@ import { getPlaylists, convertPlaylist } from "./playlists";
 
 const app = express();
 
+const PORT = process.env.PORT || 4000;
+
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", ["http://localhost:3000"]);
   res.header(
@@ -27,6 +29,6 @@ app.get("/yt-callback", youtubeCallback);
 app.get("/get-playlists", getPlaylists);
 app.get("/convert-playlist", convertPlaylist);
 
-app.listen(4000, () => {
+app.listen(PORT, () => {
   console.log("Server started at port 4000");
 });
