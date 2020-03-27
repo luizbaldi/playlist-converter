@@ -1,7 +1,7 @@
 import { useContext, useCallback, useState, useEffect } from "react";
 
 import { spotifyIcon, youtubeIcon } from "../../icons";
-import { AuthContext } from "../../contexts";
+import { AuthContext, ModalContext } from "../../contexts";
 import api, { baseUrl } from "../../utils/api";
 
 import { GetPlaylistResponse } from "../../../../server/src/types";
@@ -44,6 +44,8 @@ const usePlatformReducer = () => {
     setYoutubeToken
   } = useContext(AuthContext);
 
+  const { showAlert } = useContext(ModalContext);
+
   const onTogglePress = useCallback(() => {
     setFrom(to);
     setTo(from);
@@ -77,7 +79,7 @@ const usePlatformReducer = () => {
           }))
         });
       } catch (error) {
-        alert(`Your ${from.type} token has expired, please reconnect.`);
+        showAlert(`Your ${from.type} token has expired, please reconnect.`);
 
         if (from.type === "spotify") {
           setSpotifyToken("");

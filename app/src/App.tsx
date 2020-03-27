@@ -4,7 +4,7 @@ import { reset, themes } from "react95";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 
 import { AuthRedirect, Home } from "./screens";
-import { AuthProvider } from "./contexts";
+import { AuthProvider, ModalProvider } from "./contexts";
 
 const ResetStyles = createGlobalStyle`
   ${reset};
@@ -33,7 +33,9 @@ const App = () => (
               <AuthRedirect auth="youtube" />
             </Route>
             <Route path="/">
-              <Home />
+              <ModalProvider>
+                <Home />
+              </ModalProvider>
             </Route>
           </AuthProvider>
         </ThemeProvider>

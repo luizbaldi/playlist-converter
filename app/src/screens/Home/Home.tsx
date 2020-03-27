@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useState, useContext } from "react";
 import styled from "styled-components";
 import {
   Window,
@@ -12,6 +12,7 @@ import {
 import { refreshIcon } from "../../icons";
 import { capitalizeFirst } from "../../utils/string";
 import api from "../../utils/api";
+import { ModalContext } from "../../contexts";
 
 import usePlatform from "./usePlatform";
 import PlatformBox from "./components/PlatformBox";
@@ -19,6 +20,7 @@ import PlatformBox from "./components/PlatformBox";
 const Home = () => {
   const [playlistDestination, setPlaylistDestination] = useState("");
   const [currentPlaylist, setCurrentPlaylist] = useState<string | null>(null);
+  const { showAlert } = useContext(ModalContext);
 
   const {
     youtubeToken,
@@ -47,27 +49,27 @@ const Home = () => {
 
   const convertPlaylist = async () => {
     if (!youtubeToken && !spotifyToken) {
-      alert("Please, log in to both platforms before starting conversion");
+      showAlert("Please, log in to both platforms before starting conversion");
       return;
     }
 
     if (!youtubeToken) {
-      alert(`Please, log in to youtube to continue :)`);
+      showAlert(`Please, log in to youtube to continue.`);
       return;
     }
 
     if (!spotifyToken) {
-      alert(`Please, log in to spotify to continue :)`);
+      showAlert(`Please, log in to spotify to continue.`);
       return;
     }
 
     if (!playlistDestination) {
-      alert("Please, type a playlist destination name to continue :)");
+      showAlert("Please, type a playlist destination name to continue.");
       return;
     }
 
     if (!currentPlaylist) {
-      alert("Please, select a origni playlist to be converted :)");
+      showAlert("Please, select a origni playlist to be converted.");
       return;
     }
 
@@ -82,11 +84,11 @@ const Home = () => {
     try {
       await api.get("/convert-playlist", { params });
 
-      alert("Playlist successfully converted :)");
+      showAlert("Playlist successfully converted :)");
     } catch (error) {
-      const message = error?.data?.message || "Oops, something went wrong :(";
+      const message = error?.data?.message || "Something went wrong :(";
 
-      alert(message);
+      showAlert(message);
     }
   };
 
