@@ -16,6 +16,7 @@ module.exports = {
     project: "./tsconfig.json"
   },
   rules: {
-    "comma-dangle": "off"
+    "comma-dangle": "off",
+    "import/prefer-default-export": "off"
   }
 };
