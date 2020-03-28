@@ -25,7 +25,11 @@ yarn-error.log*
 # app
 app/node_modules
 app/.env
+app/build
 
 # server
 server/node_modules
 server/.env
+server/.env.development
+server/.env.production
+server/build
