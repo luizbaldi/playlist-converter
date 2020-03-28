@@ -19,7 +19,7 @@ const {
   SPOTIFY_CLIENT_ID: spotifyClientId,
   SPOTIFY_CLIENT_SECRET: spotifyClientSecret,
   SPOTIFY_REDIRECT_URI: spotifyRedirectUrl,
-  FRONTEND_URI: frontendUri
+  FRONTEND_URL: frontendUrl
 } = process.env;
 
 const baseApiUrl = "https://api.spotify.com/v1";
@@ -56,7 +56,7 @@ export const spotifyCallback = (req: Request, res: Response) => {
   request.post(authOptions, (error, response, body) => {
     const { access_token: accessToken } = body;
 
-    res.redirect(`${frontendUri}/spotify-auth?access_token=${accessToken}`);
+    res.redirect(`${frontendUrl}/spotify-auth?access_token=${accessToken}`);
   });
 };
 

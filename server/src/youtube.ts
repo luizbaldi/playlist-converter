@@ -11,7 +11,7 @@ const {
   YOUTUBE_CLIENT_ID: youtubeClientId,
   YOUTUBE_SECRET_KEY: youtubeSecretKey,
   YOUTUBE_REDIRECT_URL: youtubeRedirectUrl,
-  FRONTEND_URI: frontendUri
+  FRONTEND_URL: frontendUrl
 } = process.env;
 
 const youtubeOAuthClient = new google.auth.OAuth2(
@@ -39,7 +39,7 @@ export const youtubeCallback = async (req: Request, res: Response) => {
   const { code } = querystring.parse(url.split("/yt-callback?")[1]);
   const { tokens } = await youtubeOAuthClient.getToken(code.toString());
 
-  res.redirect(`${frontendUri}/yt-auth?access_token=${tokens.access_token}`);
+  res.redirect(`${frontendUrl}/yt-auth?access_token=${tokens.access_token}`);
 };
 
 export const getYoutubePlaylists = async (

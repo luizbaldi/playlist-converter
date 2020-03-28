@@ -1,20 +1,18 @@
 import express from "express";
+import dotenv from "dotenv";
 
 import { spotifyLogin, spotifyCallback } from "./spotify";
 import { youtubeLogin, youtubeCallback } from "./youtube";
 import { getPlaylists, convertPlaylist } from "./playlists";
 
+dotenv.config();
+
 const app = express();
 
-const PORT = process.env.PORT || 4000;
-
-const validOrigings = [
-  "http://localhost:3000",
-  "https://playlist-converter-api.herokuapp.com"
-];
+const { PORT = 4000, FRONTEND_URL: frontendUrl = "" } = process.env;
 
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", validOrigings);
+  res.header("Access-Control-Allow-Origin", [frontendUrl]);
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept"
