@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { reset, themes } from "react95";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 
@@ -23,23 +23,25 @@ const App = () => (
   <>
     <ResetStyles />
     <Router>
-      <Switch>
-        <ThemeProvider theme={themes.default}>
-          <AuthProvider>
-            <Route path="/spotify-auth">
-              <AuthRedirect auth="spotify" />
-            </Route>
-            <Route path="/yt-auth">
-              <AuthRedirect auth="youtube" />
-            </Route>
-            <Route path="/">
-              <ModalProvider>
-                <Home />
-              </ModalProvider>
-            </Route>
-          </AuthProvider>
-        </ThemeProvider>
-      </Switch>
+      <div>
+        <Switch>
+          <ThemeProvider theme={themes.default}>
+            <AuthProvider>
+              <Route path="/spotify-auth">
+                <AuthRedirect auth="spotify" />
+              </Route>
+              <Route path="/yt-auth">
+                <AuthRedirect auth="youtube" />
+              </Route>
+              <Route path="/">
+                <ModalProvider>
+                  <Home />
+                </ModalProvider>
+              </Route>
+            </AuthProvider>
+          </ThemeProvider>
+        </Switch>
+      </div>
     </Router>
   </>
 );

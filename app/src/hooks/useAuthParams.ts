@@ -1,7 +1,9 @@
-import { useLocation } from "react-router-dom";
+import useReactRouter from "use-react-router";
 
 const useAuthParams = () => {
-  const { search } = useLocation();
+  const {
+    location: { search }
+  } = useReactRouter();
   const searchParams = new URLSearchParams(search);
   const accessToken = searchParams.get("access_token");
 

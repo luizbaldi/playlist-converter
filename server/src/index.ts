@@ -8,8 +8,13 @@ const app = express();
 
 const PORT = process.env.PORT || 4000;
 
+const validOrigings = [
+  "http://localhost:3000",
+  "https://playlist-converter-api.herokuapp.com"
+];
+
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", ["http://localhost:3000"]);
+  res.header("Access-Control-Allow-Origin", validOrigings);
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept"
