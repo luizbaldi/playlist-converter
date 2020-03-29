@@ -142,3 +142,75 @@ interface TrackLinkObject {
 export interface PlaylistSnapshotResponse {
   snapshot_id: string;
 }
+
+/**
+ * Create a Playlist
+ *
+ * POST /v1/users/{user_id}/playlists
+ * https://developer.spotify.com/web-api/create-playlist/
+ */
+export interface CreatePlaylistResponse extends PlaylistObjectFull {}
+
+/**
+ * Playlist Object Full
+ * [](https://developer.spotify.com/web-api/object-model/)
+ */
+interface PlaylistObjectFull extends PlaylistBaseObject {
+  description: string;
+  followers: FollowersObject;
+  tracks: PagingObject<PlaylistTrackObject>;
+  error?: object;
+}
+
+/**
+ * Followers Object
+ * [](https://developer.spotify.com/web-api/object-model/)
+ */
+interface FollowersObject {
+  href: string;
+  total: number;
+}
+
+/**
+ * Base Playlist Object. Does not in itself exist in Spotify Web Api,
+ * but needs to be made since the tracks types vary in the Full and Simplified versions.
+ */
+interface PlaylistBaseObject {
+  collaborative: boolean;
+  external_urls: ExternalUrlObject;
+  href: string;
+  id: string;
+  images: ImageObject[];
+  name: string;
+  owner: UserObjectPublic;
+  public: boolean;
+  snapshot_id: string;
+  type: "playlist";
+  uri: string;
+}
+
+/**
+ * The Track Object in Playlists
+ * [](https://developer.spotify.com/web-api/object-model/)
+ */
+interface PlaylistTrackObject {
+  added_at: string;
+  added_by: UserObjectPublic;
+  is_local: boolean;
+  track: TrackObjectFull;
+}
+
+/**
+ * User Object (Public)
+ * [](https://developer.spotify.com/web-api/object-model/#track-object-simplified)
+ */
+interface UserObjectPublic {
+  display_name?: string;
+  external_urls: ExternalUrlObject;
+  followers?: FollowersObject;
+  href: string;
+  id: string;
+  images?: ImageObject[];
+  type: "user";
+  uri: string;
+}

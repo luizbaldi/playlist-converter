@@ -8,10 +8,15 @@ import {
   SpotifyUserInfoBody,
   SpotifyPlaylistsBody,
   SpotifyTracksBody,
-  Songs
+  Songs,
+  NewPlaylist
 } from "./types";
 
-import { TrackSearchResponse, PlaylistSnapshotResponse } from "./types/spotify";
+import {
+  TrackSearchResponse,
+  PlaylistSnapshotResponse,
+  CreatePlaylistResponse
+} from "./types/spotify";
 
 dotenv.config();
 
@@ -143,7 +148,7 @@ export const getSpotifyPlaylistSongs = (
 export const createSpotifyPlaylist = (
   accessToken: string,
   playlistName: string
-): Promise<string> =>
+): Promise<NewPlaylist> =>
   new Promise((resolve, reject) => {
     getUserInfo(accessToken, (error, response, body: SpotifyUserInfoBody) => {
       const { id: userId } = body;
@@ -157,15 +162,19 @@ export const createSpotifyPlaylist = (
           form: JSON.stringify({ name: playlistName }),
           json: true
         },
-        (playlistError, playlistResponse, playlistBody) => {
-          if (playlistError || playlistBody.error) {
+        (
+          playlistError,
+          playlistResponse,
+          playlistBody: CreatePlaylistResponse
+        ) => {
+          if (playlistError || playlistBody?.error) {
             reject(new Error("Error creating spotify playlist :("));
             return;
           }
 
-          const { id } = playlistBody;
+          const { id, external_urls: externalUrls } = playlistBody;
 
-          resolve(id);
+          resolve({ id, url: externalUrls.spotify });
         }
       );
     });

@@ -133,4 +133,12 @@ declare module "react95" {
     placeholder?: string;
     value?: string;
   }>;
+
+  export const Anchor: FunctionComponent<{
+    href: string;
+    children: ReactNode;
+    className?: string;
+    style?: object;
+    target?: string;
+  }>;
 }

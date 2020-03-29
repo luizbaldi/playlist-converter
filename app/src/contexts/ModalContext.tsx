@@ -4,7 +4,7 @@ import Modal from "../components";
 
 type ModalContext = {
   isOpen: boolean;
-  showAlert: (message: string) => void;
+  showAlert: (message: React.ReactNode) => void;
 };
 
 const ModalContext = createContext<ModalContext>({
@@ -18,9 +18,9 @@ type Props = {
 
 const ModalProvider = ({ children }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<React.ReactNode>(null);
 
-  const showAlert = (body: string) => {
+  const showAlert = (body: React.ReactNode) => {
     setMessage(body);
     setIsOpen(true);
   };

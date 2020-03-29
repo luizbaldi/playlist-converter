@@ -24,7 +24,7 @@ ReactModal.setAppElement("#root");
 type ModalContext = {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  setMessage: (message: string) => void;
+  setMessage: (message: React.ReactNode) => void;
 };
 
 const ModalContext = createContext<ModalContext>({
@@ -34,7 +34,7 @@ const ModalContext = createContext<ModalContext>({
 });
 
 type Props = {
-  message: string;
+  message: React.ReactNode;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 };

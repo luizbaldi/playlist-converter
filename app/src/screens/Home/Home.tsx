@@ -6,10 +6,11 @@ import {
   WindowContent,
   Button,
   Select,
-  TextField
+  TextField,
+  Anchor
 } from "react95";
 
-import { refreshIcon } from "../../icons";
+import { refreshIcon, spinnerIcon } from "../../icons";
 import { capitalizeFirst } from "../../utils/string";
 import api from "../../utils/api";
 import { ModalContext } from "../../contexts";
@@ -20,6 +21,7 @@ import PlatformBox from "./components/PlatformBox";
 const Home = () => {
   const [playlistDestination, setPlaylistDestination] = useState("");
   const [currentPlaylist, setCurrentPlaylist] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const { showAlert } = useContext(ModalContext);
 
   const {
@@ -49,17 +51,17 @@ const Home = () => {
 
   const convertPlaylist = async () => {
     if (!youtubeToken && !spotifyToken) {
-      showAlert("Please, log in to both platforms before starting conversion");
+      showAlert("Please, login to both platforms before starting conversion");
       return;
     }
 
     if (!youtubeToken) {
-      showAlert(`Please, log in to youtube to continue.`);
+      showAlert(`Please, login to youtube to continue.`);
       return;
     }
 
     if (!spotifyToken) {
-      showAlert(`Please, log in to spotify to continue.`);
+      showAlert(`Please, login to spotify to continue.`);
       return;
     }
 
@@ -82,74 +84,122 @@ const Home = () => {
     };
 
     try {
-      await api.get("/convert-playlist", { params });
+      setIsLoading(true);
+      const {
+        data: { url }
+      } = await api.get("/convert-playlist", { params });
 
-      showAlert("Playlist successfully converted :)");
+      showAlert(
+        <div style={{ textAlign: "center" }}>
+          Playlist successfully converted :)
+          {url && (
+            <>
+              <br />
+              <p style={{ marginTop: 12 }}>
+                <Anchor href={url} target="__blank">
+                  Link
+                </Anchor>
+              </p>
+            </>
+          )}
+        </div>
+      );
     } catch (error) {
       const message = error?.data?.message || "Something went wrong :(";
 
       showAlert(message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <Window>
-      <StyledWindowHeader>
-        <span>playlist-converter.exe</span>
-      </StyledWindowHeader>
-      <WindowContent>
-        <StyledHeader>
-          <PlatformBox
-            label="From:"
-            platform={capitalizeFirst(from.type)}
-            icon={from.icon}
-          >
-            {!getToken(from.type) && (
-              <Button>
-                <StyledConnectLink href={from.href}>Connect</StyledConnectLink>
-              </Button>
-            )}
-            {getToken(from.type) &&
-              (playlists.loading ? (
-                <StyledLoading>Loading...</StyledLoading>
-              ) : (
-                <StyledSelect
-                  items={playlists.items}
-                  onChange={onCurrentPlaylistChange}
+    <>
+      <Window>
+        <StyledWindowHeader>
+          <span>playlist-converter.exe</span>
+        </StyledWindowHeader>
+        <WindowContent>
+          <StyledHeader>
+            <PlatformBox
+              label="From:"
+              platform={capitalizeFirst(from.type)}
+              icon={from.icon}
+            >
+              {!getToken(from.type) && (
+                <Button>
+                  <StyledConnectLink href={from.href}>
+                    Connect
+                  </StyledConnectLink>
+                </Button>
+              )}
+              {getToken(from.type) &&
+                (playlists.loading ? (
+                  <StyledLoading>Loading...</StyledLoading>
+                ) : (
+                  <StyledSelect
+                    items={playlists.items}
+                    onChange={onCurrentPlaylistChange}
+                  />
+                ))}
+            </PlatformBox>
+            <StyledChangeOrderContainer>
+              <Button onClick={onTogglePress}>
+                <StyledRotateIcon
+                  src={refreshIcon}
+                  alt="Invert platforms icon"
                 />
-              ))}
-          </PlatformBox>
-          <StyledChangeOrderContainer>
-            <Button onClick={onTogglePress}>
-              <StyledRotateIcon src={refreshIcon} alt="Invert platforms icon" />
-            </Button>
-          </StyledChangeOrderContainer>
-          <PlatformBox
-            label="To:"
-            platform={capitalizeFirst(to.type)}
-            icon={to.icon}
-          >
-            {!getToken(to.type) ? (
-              <Button>
-                <StyledConnectLink href={to.href}>Connect</StyledConnectLink>
               </Button>
-            ) : (
-              <TextField
-                placeholder="Your playlist name"
-                width="80%"
-                onChange={onPlaylistDestinationChange}
-                value={playlistDestination}
-              />
-            )}
-          </PlatformBox>
-        </StyledHeader>
-        <StyledFooter>
-          <Button size="lg" onClick={convertPlaylist} fullWidth>
-            Convert
-          </Button>
-        </StyledFooter>
-      </WindowContent>
-    </Window>
+            </StyledChangeOrderContainer>
+            <PlatformBox
+              label="To:"
+              platform={capitalizeFirst(to.type)}
+              icon={to.icon}
+            >
+              {!getToken(to.type) ? (
+                <Button>
+                  <StyledConnectLink href={to.href}>Connect</StyledConnectLink>
+                </Button>
+              ) : (
+                <TextField
+                  placeholder="Your playlist name"
+                  width="80%"
+                  onChange={onPlaylistDestinationChange}
+                  value={playlistDestination}
+                />
+              )}
+            </PlatformBox>
+          </StyledHeader>
+          <StyledFooter>
+            <Button
+              size="lg"
+              onClick={convertPlaylist}
+              disabled={isLoading}
+              fullWidth
+            >
+              {isLoading ? (
+                <StyledLoader src={spinnerIcon} alt="Loading spinner" />
+              ) : (
+                <span>Convert</span>
+              )}
+            </Button>
+          </StyledFooter>
+        </WindowContent>
+      </Window>
+      <StyledFooterMessage>
+        Made with 💚 by
+        <a href="http://luizbaldi.com/" target="__blank">
+          {" Luiz Baldi"}
+        </a>
+        {` - `}
+        <Anchor
+          href="https://github.com/luizbaldi/playlist-converter"
+          target="__blank"
+        >
+          Source Code
+        </Anchor>
+      </StyledFooterMessage>
+    </>
   );
 };
 
@@ -194,6 +244,20 @@ const StyledSelect = styled(Select)`
 
 const StyledLoading = styled.span`
   font-size: 0.8em;
+`;
+
+const StyledFooterMessage = styled.span`
+  position: absolute;
+  bottom: 8px;
+  width: 100%;
+  left: 0;
+  text-align: center;
+  color: #ced0cf;
+  font-size: 0.8em;
+`;
+
+const StyledLoader = styled.img`
+  height: 8px;
 `;
 
 export default Home;

@@ -3,7 +3,7 @@ import { google } from "googleapis";
 import querystring from "querystring";
 import dotenv from "dotenv";
 
-import { Songs } from "./types";
+import { Songs, NewPlaylist } from "./types";
 
 dotenv.config();
 
@@ -94,14 +94,14 @@ export const getYoutubePlaylistSongs = async (
 export const createYoutubePlaylist = async (
   accessToken: string,
   playlistName: string
-): Promise<string> => {
+): Promise<NewPlaylist> => {
   youtubeOAuthClient.setCredentials({
     access_token: accessToken
   });
 
   try {
     const {
-      data: { id: playlistId }
+      data: { id }
       // for some reason this lib is not in accordance with the docs :(
       // @ts-ignore
     } = await youtubeClient.playlists.insert({
@@ -113,7 +113,7 @@ export const createYoutubePlaylist = async (
       }
     });
 
-    return playlistId;
+    return { id, url: `https://music.youtube.com/playlist?list=${id}` };
   } catch (error) {
     console.log(error.message);
     throw new Error("Error creating youtube playlist :(");

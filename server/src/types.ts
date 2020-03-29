@@ -80,3 +80,8 @@ export type Songs = {
   id: string;
   name: string;
 }[];
+
+export type NewPlaylist = {
+  id: string;
+  url: string;
+};
