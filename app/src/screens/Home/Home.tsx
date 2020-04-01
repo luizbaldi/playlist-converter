@@ -240,6 +240,12 @@ const StyledConnectLink = styled.a`
 
 const StyledSelect = styled(Select)`
   width: 80%;
+
+  ul li {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
 `;
 
 const StyledLoading = styled.span`
