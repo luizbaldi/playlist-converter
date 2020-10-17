@@ -41,7 +41,7 @@ const Home = () => {
     ) {
       setCurrentPlaylist(playlists.items[0].value);
     }
-  }, [playlists]);
+  }, [playlists, currentPlaylist]);
   
   const onPlaylistDestinationChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPlaylistDestination(e.target.value);
