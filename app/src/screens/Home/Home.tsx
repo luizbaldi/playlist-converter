@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState, useContext } from "react";
+import React, { ChangeEvent, useState, useContext, useEffect } from "react";
 import styled from "styled-components";
 import {
   Window,
@@ -33,6 +33,16 @@ const Home = () => {
     playlists
   } = usePlatform();
 
+  useEffect(() => {
+    if (
+      !currentPlaylist &&
+      playlists?.items?.length &&
+      playlists.items[0]?.value
+    ) {
+      setCurrentPlaylist(playlists.items[0].value);
+    }
+  }, [playlists]);
+  
   const onPlaylistDestinationChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPlaylistDestination(e.target.value);
   };
@@ -89,6 +99,7 @@ const Home = () => {
         data: { url }
       } = await api.get("/convert-playlist", { params });
 
+      console.log(url);
       showAlert(
         <div style={{ textAlign: "center" }}>
           Playlist successfully converted :)
