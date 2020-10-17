@@ -23,7 +23,7 @@ const Home = () => {
   const [currentPlaylist, setCurrentPlaylist] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { showAlert } = useContext(ModalContext);
-
+  
   const {
     youtubeToken,
     spotifyToken,
@@ -71,7 +71,7 @@ const Home = () => {
     }
 
     if (!currentPlaylist) {
-      showAlert("Please, select a origni playlist to be converted.");
+      showAlert("Please, select a origin playlist to be converted.");
       return;
     }
 
