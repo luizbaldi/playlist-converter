@@ -23,7 +23,7 @@ const Home = () => {
   const [currentPlaylist, setCurrentPlaylist] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { showAlert } = useContext(ModalContext);
-  
+
   const {
     youtubeToken,
     spotifyToken,
@@ -42,7 +42,7 @@ const Home = () => {
       setCurrentPlaylist(playlists.items[0].value);
     }
   }, [playlists, currentPlaylist]);
-  
+
   const onPlaylistDestinationChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPlaylistDestination(e.target.value);
   };
@@ -99,7 +99,6 @@ const Home = () => {
         data: { url }
       } = await api.get("/convert-playlist", { params });
 
-      console.log(url);
       showAlert(
         <div style={{ textAlign: "center" }}>
           Playlist successfully converted :)
@@ -148,11 +147,11 @@ const Home = () => {
                 (playlists.loading ? (
                   <StyledLoading>Loading...</StyledLoading>
                 ) : (
-                  <StyledSelect
-                    items={playlists.items}
-                    onChange={onCurrentPlaylistChange}
-                  />
-                ))}
+                    <StyledSelect
+                      items={playlists.items}
+                      onChange={onCurrentPlaylistChange}
+                    />
+                  ))}
             </PlatformBox>
             <StyledChangeOrderContainer>
               <Button onClick={onTogglePress}>
@@ -172,13 +171,13 @@ const Home = () => {
                   <StyledConnectLink href={to.href}>Connect</StyledConnectLink>
                 </Button>
               ) : (
-                <TextField
-                  placeholder="Your playlist name"
-                  width="80%"
-                  onChange={onPlaylistDestinationChange}
-                  value={playlistDestination}
-                />
-              )}
+                  <TextField
+                    placeholder="Your playlist name"
+                    width="80%"
+                    onChange={onPlaylistDestinationChange}
+                    value={playlistDestination}
+                  />
+                )}
             </PlatformBox>
           </StyledHeader>
           <StyledFooter>
@@ -191,8 +190,8 @@ const Home = () => {
               {isLoading ? (
                 <StyledLoader src={spinnerIcon} alt="Loading spinner" />
               ) : (
-                <span>Convert</span>
-              )}
+                  <span>Convert</span>
+                )}
             </Button>
           </StyledFooter>
         </WindowContent>
