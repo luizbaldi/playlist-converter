@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState, useContext } from "react";
+import React, { ChangeEvent, useState, useContext, useEffect } from "react";
 import styled from "styled-components";
 import {
   Window,
@@ -32,6 +32,16 @@ const Home = () => {
     onTogglePress,
     playlists
   } = usePlatform();
+
+  useEffect(() => {
+    if (
+      !currentPlaylist &&
+      playlists?.items?.length &&
+      playlists.items[0]?.value
+    ) {
+      setCurrentPlaylist(playlists.items[0].value);
+    }
+  }, [playlists, currentPlaylist]);
 
   const onPlaylistDestinationChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPlaylistDestination(e.target.value);
@@ -71,7 +81,7 @@ const Home = () => {
     }
 
     if (!currentPlaylist) {
-      showAlert("Please, select a origni playlist to be converted.");
+      showAlert("Please, select a origin playlist to be converted.");
       return;
     }
 
@@ -137,11 +147,11 @@ const Home = () => {
                 (playlists.loading ? (
                   <StyledLoading>Loading...</StyledLoading>
                 ) : (
-                  <StyledSelect
-                    items={playlists.items}
-                    onChange={onCurrentPlaylistChange}
-                  />
-                ))}
+                    <StyledSelect
+                      items={playlists.items}
+                      onChange={onCurrentPlaylistChange}
+                    />
+                  ))}
             </PlatformBox>
             <StyledChangeOrderContainer>
               <Button onClick={onTogglePress}>
@@ -161,13 +171,13 @@ const Home = () => {
                   <StyledConnectLink href={to.href}>Connect</StyledConnectLink>
                 </Button>
               ) : (
-                <TextField
-                  placeholder="Your playlist name"
-                  width="80%"
-                  onChange={onPlaylistDestinationChange}
-                  value={playlistDestination}
-                />
-              )}
+                  <TextField
+                    placeholder="Your playlist name"
+                    width="80%"
+                    onChange={onPlaylistDestinationChange}
+                    value={playlistDestination}
+                  />
+                )}
             </PlatformBox>
           </StyledHeader>
           <StyledFooter>
@@ -180,8 +190,8 @@ const Home = () => {
               {isLoading ? (
                 <StyledLoader src={spinnerIcon} alt="Loading spinner" />
               ) : (
-                <span>Convert</span>
-              )}
+                  <span>Convert</span>
+                )}
             </Button>
           </StyledFooter>
         </WindowContent>
